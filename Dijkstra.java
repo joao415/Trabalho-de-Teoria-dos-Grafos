@@ -55,14 +55,14 @@ public class Dijkstra {
             if (grafo[vertice][i] > 0 && grafo[vertice][i] < Integer.MAX_VALUE) {
 
                 if (contador < 1) {
-                    caminho += numerosParaLetras(vertice) + "->";
+                    caminho += numerosParaLetras(vertice + 1) + "->";
                 }
                 
                 custo += grafo[vertice][i];
 
                 if (i == vertice2Int) {
                     if (custo < obterCusto()) {
-                        gravarRetorno("Caminho: " + caminho + numerosParaLetras(i) + "\n" +
+                        gravarRetorno("Caminho: " + caminho + numerosParaLetras(i + 1) + "\n" +
                         "Custo: " + custo);
 
                         gravarCusto(custo); 
@@ -102,45 +102,13 @@ public class Dijkstra {
     }
 
     private int letrasParaNumeros(String vertice) {
-        switch (vertice) {
-            case "A":
-            return 0;
-            case "B":
-            return 1;
-            case "C":
-            return 2;
-            case "D":
-            return 3;
-            case "E":
-            return 4;
-            case "F":
-            return 5;
-            case "G":
-            return 6;
-            default:
-            return 7;
-        }
+        char letra = Character.toUpperCase(vertice.charAt(0));
+        return letra - 'A';
     }
 
     private String numerosParaLetras(int vertice) {
-        switch (vertice) {
-            case 0:
-            return "A";
-            case 1:
-            return "B";
-            case 2:
-            return "C";
-            case 3:
-            return "D";
-            case 4:
-            return "E";
-            case 5:
-            return "F";
-            case 6:
-            return "G";
-            default:
-            return "Vértice inválido.";
-        }
+        char letra = (char) ('A' + vertice - 1);
+        return String.valueOf(letra);
     }
 
     private void gravarCusto(int custo) {
