@@ -1,5 +1,7 @@
 // João Marcelo Schneider da Silva e Souza
 
+// Este arquivo contém uma solução alternativa para a questão 1, que eu implementei por curiosidade apenas.
+
 public class AlternativaAoDijkstra {
     int tamanho = 7;
     String[][] matriz = new String[7][7];
