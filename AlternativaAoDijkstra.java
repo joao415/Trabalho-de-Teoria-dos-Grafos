@@ -1,6 +1,6 @@
 // João Marcelo Schneider da Silva e Souza
 
-public class Dijkstra {
+public class AlternativaAoDijkstra {
     int tamanho = 7;
     String[][] matriz = new String[7][7];
 
@@ -13,7 +13,7 @@ public class Dijkstra {
     int custo = Integer.MAX_VALUE;
     String retorno = "";
 
-    String[][] matrizDeIncidencia = {
+    String[][] matrizDeCusto = {
         {"0", "I", "I", "I", "I", "I", "I"}, 
         {"I", "0", "1", "I", "I", "I", "I"},
         {"4", "I", "0", "I", "I", "I", "I"},
@@ -23,9 +23,9 @@ public class Dijkstra {
         {"I", "I", "I", "I", "5", "I", "0"}
     };
 
-    int[][] grafo = converterParaInteiro(matrizDeIncidencia);
+    int[][] grafo = converterParaInteiro(matrizDeCusto);
 
-    public void dijkstra() {
+    public void alternativaAoDijkstra() {
 
         String caminho = "";
         int custo;
@@ -37,7 +37,7 @@ public class Dijkstra {
                 caminho = vertice1 + "->";
                 custo += grafo[vertice1Int][i];
 
-                dijkstra(i, caminho, custo);
+                alternativaAoDijkstra(i, caminho, custo);
 
             }
         }
@@ -47,7 +47,7 @@ public class Dijkstra {
 
     }
 
-    private void dijkstra(int vertice, String caminho, int custo) {
+    private void alternativaAoDijkstra(int vertice, String caminho, int custo) {
         int contador = 0;
 
         for (int i = 0; i < tamanho; i++) {
