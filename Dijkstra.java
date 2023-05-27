@@ -1,4 +1,5 @@
-
+// João Marcelo Schneider da Silva e Souza
+// Guilherme Soares
 
 public class Dijkstra {
 

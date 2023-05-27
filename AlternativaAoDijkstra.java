@@ -1,8 +1,9 @@
 // João Marcelo Schneider da Silva e Souza
+// Guilherme Soares
 
 /**
  * Este arquivo contém uma solução alternativa para a questão 1, 
- * que eu implementei por curiosidade apenas.
+ * que implementamos por curiosidade apenas.
  */
 
 public class AlternativaAoDijkstra {
