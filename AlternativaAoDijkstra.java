@@ -1,6 +1,9 @@
 // João Marcelo Schneider da Silva e Souza
 
-// Este arquivo contém uma solução alternativa para a questão 1, que eu implementei por curiosidade apenas.
+/**
+ * Este arquivo contém uma solução alternativa para a questão 1, 
+ * que eu implementei por curiosidade apenas.
+ */
 
 public class AlternativaAoDijkstra {
     int tamanho = 7;
@@ -73,7 +76,7 @@ public class AlternativaAoDijkstra {
 
                 }
 
-                dijkstra(i, caminho, custo);
+                alternativaAoDijkstra(i, caminho, custo);
 
                 custo -= grafo[vertice][i];
 

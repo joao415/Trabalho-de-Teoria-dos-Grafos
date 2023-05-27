@@ -1,4 +1,4 @@
-package Projeto2;
+
 
 public class Dijkstra {
 
