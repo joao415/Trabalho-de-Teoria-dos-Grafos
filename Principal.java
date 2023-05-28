@@ -7,7 +7,8 @@ public class Principal {
 
         //alternativaAoDijkstra.alternativaAoDijkstra();
 
-        Dijkstra dj = new Dijkstra(7,
+		/*
+		 * Dijkstra dj = new Dijkstra(7,
 				new int[][] { {0, 'I', 'I', 'I', 'I', 'I', 'I'}, 
 							{'I', 0, 'I', 'I', 'I', 'I', 'I'},	
 							{4, 'I', 0, 'I', 'I', 'I','I'}, 
@@ -25,6 +26,11 @@ public class Principal {
 				}			}
 			System.out.println("| \n");
 		}
+		 */
+        
+		ComponentesFortementeConexas componentesFortementeConexas = new ComponentesFortementeConexas();
+
+		componentesFortementeConexas.componentesFortementeConexas();
 
     }
 }
