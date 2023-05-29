@@ -60,7 +60,6 @@ public class ComponentesFortementeConexas {
         arestas.add(aresta15);
 
         ArrayList<ArrayList<String>> componentes = componentesFortementeConexas(arestas);
-        System.out.println(componentes.toString());
 
         String resultado = "";
 
@@ -69,7 +68,6 @@ public class ComponentesFortementeConexas {
 
             for (String vertice: componente) {
                 resultado += vertice + " ";
-                System.out.println(vertice);
             }
 
             resultado += "}\n";
@@ -88,6 +86,7 @@ public class ComponentesFortementeConexas {
             }
         }
 
+        visitados.clear();
         ArrayList<ArrayList<String>> componentesFortementeConexas = new ArrayList<>();
 
         while (!pilha.isEmpty()) {
