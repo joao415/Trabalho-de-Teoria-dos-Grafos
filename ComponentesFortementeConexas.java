@@ -2,12 +2,13 @@
 // Guilherme Soares
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 public class ComponentesFortementeConexas {
     int qtdTestes = 1;
@@ -15,33 +16,37 @@ public class ComponentesFortementeConexas {
     int qtdVertices = 10;
     int qtdArestas = 15;
 
-    String[] verticesString = new String[qtdVertices];
-    int[] verticesInt = new int[qtdVertices];
+    String[] aresta1 = { "A", "C" };
+    String[] aresta2 = { "B", "A" };
+    String[] aresta3 = { "C", "B" };
+    String[] aresta4 = { "C", "F" };
+    String[] aresta5 = { "D", "A" };
+    String[] aresta6 = { "D", "C" };
+    String[] aresta7 = { "E", "C" };
+    String[] aresta8 = { "E", "D" };
+    String[] aresta9 = { "F", "B" };
+    String[] aresta10 = { "F", "G" };
+    String[] aresta11 = { "F", "H" };
+    String[] aresta12 = { "H", "G" };
+    String[] aresta13 = { "H", "I" };
+    String[] aresta14 = { "I", "J" };
+    String[] aresta15 = { "J", "H" };
 
-    ArrayList<String[]> arestas = new ArrayList<>();
-    int[] coloracao = new int[qtdVertices];
+    Map<String, List<String>> grafo; 
+    Map<String, Integer> fechamento; 
+    Map<String, List<String>> transposto;
 
-    Map<String, List<String>> grafo = new HashMap<>();
     Set<String> visitados = new HashSet<>();
-    Stack<String> pilha = new Stack<>();
+    Set<String> visitadosTransposto = new HashSet<>();
+    List<Integer> tempos;
 
-    String[] aresta1 = {"A", "C"};
-    String[] aresta2 = {"B", "A"};
-    String[] aresta3 = {"C", "B"};
-    String[] aresta4 = {"C", "F"};
-    String[] aresta5 = {"D", "A"};
-    String[] aresta6 = {"D", "C"};
-    String[] aresta7 = {"E", "C"};
-    String[] aresta8 = {"E", "D"};
-    String[] aresta9 = {"F", "B"};
-    String[] aresta10 = {"F", "G"};
-    String[] aresta11 = {"F", "H"};
-    String[] aresta12 = {"H", "G"};
-    String[] aresta13 = {"H", "I"};
-    String[] aresta14 = {"I", "J"};
-    String[] aresta15 = {"J", "H"};
+    int tempo;
+    int tempoTransposto;
+    int acrescimo = 0;
 
     public void componentesFortementeConexas() {
+
+        ArrayList<String[]> arestas = new ArrayList<>();
 
         arestas.add(aresta1);
         arestas.add(aresta2);
@@ -59,110 +64,182 @@ public class ComponentesFortementeConexas {
         arestas.add(aresta14);
         arestas.add(aresta15);
 
-        ArrayList<ArrayList<String>> componentes = componentesFortementeConexas(arestas);
+        grafo = construirGrafo(arestas);
+        fechamento = dfs(grafo);
+        transposto = transporGrafo(grafo);
 
-        String resultado = "";
+        System.out.println(transposto.toString());
 
-        for (ArrayList<String> componente: componentes) {
-            resultado += "{ ";
-
-            for (String vertice: componente) {
-                resultado += vertice + " ";
-            }
-
-            resultado += "}\n";
-        }
-
-        System.out.println(resultado);
+        List<List<String>> cfc = encontrarCfc(transposto);
 
     }
 
-    private ArrayList<ArrayList<String>> componentesFortementeConexas(ArrayList<String[]> arestas) {
-        construirGrafo(arestas);
+
+    private List<List<String>> encontrarCfc(Map<String, List<String>> grafo) {
+        List<List<String>> componentes = new ArrayList<>();
+        List<String> cfc = new ArrayList<>();
+        Set<String> visitados = new HashSet<>();
+
+        Map<String, Integer> achamento = dfsTransposto(grafo);
+
+        int tempo = 0;
 
         for (String vertice: grafo.keySet()) {
             if (!visitados.contains(vertice)) {
-                buscaEmProfundidade(vertice);
+                cfc.add(vertice);
+                visitados.add(vertice);
+
+                for (String f: fechamento.keySet()) {
+                    if (f.equals(vertice)) {
+                        tempo = fechamento.get(f);
+                    }
+
+                    for (String vizinho : grafo.get(vertice)) { 
+                        if (fechamento.get(vizinho) == (tempo - 1) && !visitados.contains(vizinho)) {
+                            cfc.add(vizinho);
+                            visitados.add(vizinho);
+                            tempo--;
+                        }
+        
+                    }
+
+                }
+
+                componentes.add(cfc);
+                cfc.clear();
+                tempo = 0;
+
             }
+            
         }
 
-        visitados.clear();
-        ArrayList<ArrayList<String>> componentesFortementeConexas = new ArrayList<>();
-
-        while (!pilha.isEmpty()) {
-            String vertice = pilha.pop();
-
-            if (!visitados.contains(vertice)) {
-                ArrayList<String> componente = new ArrayList<>();
-                grafo = grafoTransposto(grafo);
-                dfsTransposta(grafo, vertice, componente);
-                componentesFortementeConexas.add(componente);
-
-            }
-        }
-
-        return componentesFortementeConexas;
+        return componentes;
 
     }
 
-    private void construirGrafo(ArrayList<String[]> arestas) {
-        String origem;
-        String destino;
-        
-        for (String[] aresta: arestas) {
-            origem = aresta[0];
-            destino = aresta[1];
+    public Map<String, List<String>> transporGrafo(Map<String, List<String>> grafo) {
+        Map<String, List<String>> transposto = new HashMap<>();
 
-            grafo.putIfAbsent(origem, new ArrayList<>());
+        for (String vertice: grafo.keySet()) {
+            transposto.put(vertice, new ArrayList<>());
+        }
+
+        for (String vertice: grafo.keySet()) {
+
+            for (String vizinho : grafo.get(vertice)) {
+                transposto.get(vizinho).add(vertice);
+
+            }
+        }
+
+        return transposto;
+
+    }
+
+
+    private Map<String, List<String>> construirGrafo(ArrayList<String[]> arestas) {
+        Map<String, List<String>> grafo = new HashMap<>();
+
+        for (String[] aresta : arestas) {
+            String origem = aresta[0];
+            String destino = aresta[1];
+
+            if (!grafo.containsKey(origem)) {
+                grafo.put(origem, new ArrayList<>());
+            }
+            if (!grafo.containsKey(destino)) {
+                grafo.put(destino, new ArrayList<>());
+            }
+
             grafo.get(origem).add(destino);
 
         }
-    }
 
-    private void buscaEmProfundidade(String vertice) {
-        visitados.add(vertice);
-
-        if (grafo.containsKey(vertice)) {
-            for (String adjacente: grafo.get(vertice)) {
-                if (!visitados.contains(adjacente)) {
-                    buscaEmProfundidade(adjacente);
-                }
-            }
-        }
-
-        pilha.push(vertice);
+        return grafo;
 
     }
 
-    private Map<String, List<String>> grafoTransposto(Map<String, List<String>> grafoTransposto) {
+    private Map<String, Integer> dfs(Map<String, List<String>> grafo) {
+        tempo = 0;
+        Map<String, Integer> fechamento = new HashMap<>();
+        Set<String> visitados = new HashSet<>();
 
         for (String vertice: grafo.keySet()) {
-            grafoTransposto.put(vertice, new ArrayList<>());
-        }
-
-        for (String origem: grafo.keySet()) {
-            for (String destino: grafo.get(origem)) {
-                grafoTransposto.get(origem).add(destino);
+            if (!visitados.contains(vertice)) {
+                visitar(grafo, vertice, visitados, fechamento);
             }
         }
 
-        return grafoTransposto;
+        return fechamento;
 
     }
 
-    private void dfsTransposta(
-        Map<String, List<String>> grafo, String vertice, ArrayList<String> componente
+    private void visitar(
+        Map<String, List<String>> grafo,
+        String vertice,
+        Set<String> visitado,
+        Map<String, Integer> fechamento
     ) {
         visitados.add(vertice);
-        componente.add(vertice);
+        tempo++;
 
-        if (grafo.containsKey(vertice)) {
-            for (String adjacente: grafo.get(vertice)) {
-                if (!visitados.contains(adjacente)) {
-                    dfsTransposta(grafo, adjacente, componente);
-                }
+        for (String vizinho: grafo.get(vertice)) {
+            if (!visitados.contains(vizinho)) {
+                visitar(grafo, vizinho, visitados, fechamento);
             }
         }
 
+        tempo++;
+        fechamento.put(vertice, tempo);
+
     }
+
+    private Map<String, Integer> dfsTransposto(Map<String, List<String>> transposto) {
+        tempoTransposto = 0;
+        Map<String, Integer> achamento = new HashMap<>();
+        
+        tempos = new ArrayList<>(fechamento.values());
+        Collections.sort(tempos, Collections.reverseOrder());
+
+        for (int i = 0; i < tempos.size(); i++) {
+            for (String vertice: fechamento.keySet()) {
+                if (!visitadosTransposto.contains(vertice) && fechamento.get(vertice) == tempos.get(i)) {
+                    visitarTransposto(transposto, vertice, achamento);
+                    tempoTransposto += acrescimo;
+                }
+            }
+
+        }
+        
+
+        System.out.println(achamento.toString()); 
+            
+        return achamento;
+
+    }
+
+    private void visitarTransposto(
+        Map<String, List<String>> transposto,
+        String vertice,
+        Map<String, Integer> achamento
+    ) {
+        visitadosTransposto.add(vertice);
+        tempoTransposto++;
+        achamento.put(vertice, tempoTransposto);
+       
+
+        for (int i = 0; i < tempos.size(); i++) {
+            for (String vizinho: fechamento.keySet()) {
+                if (!visitadosTransposto.contains(vizinho) && fechamento.get(vizinho) == tempos.get(i)) {
+                    visitarTransposto(transposto, vizinho, achamento);
+                    tempoTransposto += acrescimo;
+                }
+            }
+
+        }
+        
+        acrescimo++;
+
+    }
+
 }
