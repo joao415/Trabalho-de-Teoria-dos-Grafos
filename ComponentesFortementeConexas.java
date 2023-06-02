@@ -2,7 +2,6 @@
 // Guilherme Soares
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,14 +32,16 @@ public class ComponentesFortementeConexas {
     String[] aresta15 = { "J", "H" };
 
     Map<String, List<String>> grafo; 
-    Map<String, Integer> fechamento; 
+    Map<String, Integer> fechamento = new HashMap<>();
+    Map<String, Integer> achamento = new HashMap<>();
     Map<String, List<String>> transposto;
+    Map<String, Integer> ordenado = new HashMap<>();
 
     Set<String> visitados = new HashSet<>();
     Set<String> visitadosTransposto = new HashSet<>();
     List<Integer> tempos;
-
-    int tempo;
+    
+    int tempo = 0;
     int tempoTransposto;
     int acrescimo = 0;
 
@@ -65,55 +66,57 @@ public class ComponentesFortementeConexas {
         arestas.add(aresta15);
 
         grafo = construirGrafo(arestas);
-        fechamento = dfs(grafo);
         transposto = transporGrafo(grafo);
 
-        System.out.println(transposto.toString());
+        dfs(grafo);
+        dfsTransposto(transposto);
 
-        List<List<String>> cfc = encontrarCfc(transposto);
+        
+
+        System.out.print("{ ");
+
+        int aux = encontrarCfc();
+
+        System.out.print("}" + "\n");
+
+        System.out.println("#" + qtdTestes);
+        System.out.println("##" + aux);
 
     }
 
 
-    private List<List<String>> encontrarCfc(Map<String, List<String>> grafo) {
-        List<List<String>> componentes = new ArrayList<>();
+    private int encontrarCfc() {
+        List<Integer> aux = new ArrayList<>(achamento.values());
+        Collections.sort(aux);
+
         List<String> cfc = new ArrayList<>();
-        Set<String> visitados = new HashSet<>();
 
-        Map<String, Integer> achamento = dfsTransposto(grafo);
+        int contador = 1;
+        int qtd = 1;
 
-        int tempo = 0;
-
-        for (String vertice: grafo.keySet()) {
-            if (!visitados.contains(vertice)) {
-                cfc.add(vertice);
-                visitados.add(vertice);
-
-                for (String f: fechamento.keySet()) {
-                    if (f.equals(vertice)) {
-                        tempo = fechamento.get(f);
+        for (int i = 0; i < aux.size(); i++) {
+            for (String vertice: achamento.keySet()) {
+                
+                if (achamento.get(vertice) == aux.get(i)) {
+                    
+                    if (achamento.get(vertice) == contador) {
+                        System.out.print(vertice + " ");
+                        cfc.add(vertice);
+                        contador++;
                     }
-
-                    for (String vizinho : grafo.get(vertice)) { 
-                        if (fechamento.get(vizinho) == (tempo - 1) && !visitados.contains(vizinho)) {
-                            cfc.add(vizinho);
-                            visitados.add(vizinho);
-                            tempo--;
-                        }
-        
+                    else {
+                        System.out.print("}" + "\n" + "{ " + vertice + " ");
+                        contador = contador + 2;
+                        qtd++;
                     }
 
                 }
-
-                componentes.add(cfc);
-                cfc.clear();
-                tempo = 0;
-
+                   
             }
-            
+
         }
 
-        return componentes;
+        return qtd;
 
     }
 
@@ -159,33 +162,26 @@ public class ComponentesFortementeConexas {
 
     }
 
-    private Map<String, Integer> dfs(Map<String, List<String>> grafo) {
-        tempo = 0;
-        Map<String, Integer> fechamento = new HashMap<>();
-        Set<String> visitados = new HashSet<>();
-
+    private void dfs(Map<String, List<String>> grafo) {
         for (String vertice: grafo.keySet()) {
             if (!visitados.contains(vertice)) {
-                visitar(grafo, vertice, visitados, fechamento);
+                visitar(grafo, vertice, visitados);
             }
         }
-
-        return fechamento;
 
     }
 
     private void visitar(
         Map<String, List<String>> grafo,
         String vertice,
-        Set<String> visitado,
-        Map<String, Integer> fechamento
+        Set<String> visitado
     ) {
         visitados.add(vertice);
         tempo++;
 
         for (String vizinho: grafo.get(vertice)) {
             if (!visitados.contains(vizinho)) {
-                visitar(grafo, vizinho, visitados, fechamento);
+                visitar(grafo, vizinho, visitados);
             }
         }
 
@@ -194,9 +190,7 @@ public class ComponentesFortementeConexas {
 
     }
 
-    private Map<String, Integer> dfsTransposto(Map<String, List<String>> transposto) {
-        tempoTransposto = 0;
-        Map<String, Integer> achamento = new HashMap<>();
+    private void dfsTransposto(Map<String, List<String>> transposto) {
         
         tempos = new ArrayList<>(fechamento.values());
         Collections.sort(tempos, Collections.reverseOrder());
@@ -204,24 +198,18 @@ public class ComponentesFortementeConexas {
         for (int i = 0; i < tempos.size(); i++) {
             for (String vertice: fechamento.keySet()) {
                 if (!visitadosTransposto.contains(vertice) && fechamento.get(vertice) == tempos.get(i)) {
-                    visitarTransposto(transposto, vertice, achamento);
-                    tempoTransposto += acrescimo;
+                    visitarTransposto(transposto, vertice);                    
+                    tempoTransposto++;
+
                 }
             }
-
         }
-        
-
-        System.out.println(achamento.toString()); 
-            
-        return achamento;
 
     }
 
     private void visitarTransposto(
         Map<String, List<String>> transposto,
-        String vertice,
-        Map<String, Integer> achamento
+        String vertice
     ) {
         visitadosTransposto.add(vertice);
         tempoTransposto++;
@@ -229,13 +217,11 @@ public class ComponentesFortementeConexas {
        
 
         for (int i = 0; i < tempos.size(); i++) {
-            for (String vizinho: fechamento.keySet()) {
+            for (String vizinho: transposto.get(vertice)) {
                 if (!visitadosTransposto.contains(vizinho) && fechamento.get(vizinho) == tempos.get(i)) {
-                    visitarTransposto(transposto, vizinho, achamento);
-                    tempoTransposto += acrescimo;
+                    visitarTransposto(transposto, vizinho);
                 }
             }
-
         }
         
         acrescimo++;
