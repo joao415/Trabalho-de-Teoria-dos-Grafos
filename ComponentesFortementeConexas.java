@@ -71,9 +71,17 @@ public class ComponentesFortementeConexas {
         dfs(grafo);
         dfsTransposto(transposto);
 
-        
+        System.out.println(qtdTestes);
+        System.out.println(qtdVertices + " " + qtdArestas);
 
-        System.out.print("{ ");
+        for (String[] aresta: arestas) {
+            for (String vertice: aresta) {
+                System.out.print(vertice + " ");
+            }
+            System.out.println("");
+        }
+
+        System.out.print("-----\n{ ");
 
         int aux = encontrarCfc();
 
