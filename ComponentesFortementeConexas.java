@@ -43,7 +43,6 @@ public class ComponentesFortementeConexas {
     
     int tempo = 0;
     int tempoTransposto;
-    int acrescimo = 0;
 
     public void componentesFortementeConexas() {
 
@@ -97,8 +96,6 @@ public class ComponentesFortementeConexas {
         List<Integer> aux = new ArrayList<>(achamento.values());
         Collections.sort(aux);
 
-        List<String> cfc = new ArrayList<>();
-
         int contador = 1;
         int qtd = 1;
 
@@ -109,7 +106,6 @@ public class ComponentesFortementeConexas {
                     
                     if (achamento.get(vertice) == contador) {
                         System.out.print(vertice + " ");
-                        cfc.add(vertice);
                         contador++;
                     }
                     else {
@@ -231,8 +227,6 @@ public class ComponentesFortementeConexas {
                 }
             }
         }
-        
-        acrescimo++;
 
     }
 
