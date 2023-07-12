@@ -6,7 +6,7 @@
  * que implementamos por curiosidade apenas.
  */
 
-public class AlternativaAoDijkstra {
+public class SolucaoExaustiva {
     int tamanho = 7;
     String[][] matriz = new String[7][7];
 
